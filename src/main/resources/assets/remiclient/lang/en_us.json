@@ -1,6 +1,6 @@
 {
-	"key.category.remiclient.remi": "Remi Client",
-	"key.remiclient.map": "Open the Remi map",
-	"key.remiclient.hud": "Show / hide the Remi HUD",
-	"key.remiclient.compass": "Show / hide the waypoint compass"
+ "key.category.remiclient.remi": "Remi Client",
+ "key.remiclient.map": "Open the Remi map",
+ "key.remiclient.hud": "Show / hide the Remi HUD",
+ "key.remiclient.menu": "Open the Remi menu"
 }

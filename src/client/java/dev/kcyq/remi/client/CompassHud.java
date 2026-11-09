@@ -8,10 +8,14 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public final class CompassHud {
 	private CompassHud() {}
 
-	public static void render(GuiGraphicsExtractor g, DeltaTracker dt) {
+	static boolean visible() { return RemiState.live(); }
+	static int width() { return 260; }
+	static int height() { return 24; }
+
+	public static void draw(GuiGraphicsExtractor g, int x1, int y) {
 		Minecraft mc = Minecraft.getInstance();
-		if (!RemiClient.hudOn || !RemiClient.compassOn || !RemiState.live() || mc.options.hideGui || mc.player == null) return;
-		int w = Math.min(260, g.guiWidth() - 120), x1 = g.guiWidth() / 2 - w / 2, y = 3, h = 12;
+		if (!visible() || mc.player == null) return;
+		int w = width(), h = 12;
 		double yaw = ((mc.player.getYRot() % 360) + 360) % 360; // 0 = south in Minecraft
 		Theme.panel(g, x1, y, x1 + w, y + h, Theme.BG_SOFT, 0x24FFFFFF);
 		g.fill(x1 + w / 2, y + h - 3, x1 + w / 2 + 1, y + h, Theme.ACCENT);

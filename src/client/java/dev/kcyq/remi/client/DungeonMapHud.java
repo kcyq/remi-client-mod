@@ -41,14 +41,17 @@ public final class DungeonMapHud {
 		return Theme.cap(arch);
 	}
 
-	public static void render(GuiGraphicsExtractor g, DeltaTracker dt) {
+	static boolean visible() { return RemiState.live() && RemiState.inDungeon; }
+	static int width() { int total = Math.max(2, RemiState.dgRooms + 1), cols = cols(total); return cols * CELL + (cols - 1) * GAP + 14; }
+	static int height() { int total = Math.max(2, RemiState.dgRooms + 1), cols = cols(total), rows = (total + cols - 1) / cols; return rows * CELL + (rows - 1) * GAP + 34; }
+
+	public static void draw(GuiGraphicsExtractor g, int x1, int y1) {
 		Minecraft mc = Minecraft.getInstance();
-		if (!RemiClient.hudOn || !RemiState.live() || !RemiState.inDungeon || mc.options.hideGui) return;
+		if (!visible()) return;
 		synchronized (RemiState.class) {
-			int total = RemiState.dgRooms + 1, cols = cols(total), rows = (total + cols - 1) / cols;
-			int mw = cols * CELL + (cols - 1) * GAP, mh = rows * CELL + (rows - 1) * GAP;
-			int pw = mw + 14, ph = mh + 34;
-			int x1 = g.guiWidth() - pw - 6, y1 = 6, ox = x1 + 7, oy = y1 + 24;
+			int total = RemiState.dgRooms + 1, cols = cols(total);
+			int pw = width(), ph = height();
+			int ox = x1 + 7, oy = y1 + 24;
 			int themeCol = Theme.gem(RemiState.dgTheme);
 			float t = Theme.time();
 

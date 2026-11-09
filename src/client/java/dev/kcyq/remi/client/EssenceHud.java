@@ -18,16 +18,18 @@ public final class EssenceHud {
 		return switch (slot) { case "a" -> "RC"; case "b" -> "⇧RC"; case "c" -> "F"; case "u" -> "⇧F"; default -> slot.toUpperCase(); };
 	}
 
-	public static void render(GuiGraphicsExtractor g, DeltaTracker dt) {
+	static boolean visible() { return RemiState.live() && !RemiState.gem.isEmpty() && !RemiState.gem.equals("blank"); }
+	static int width() { return 44 + Math.max(2, RemiState.abilities.size()) * 24 + 6; }
+	static int height() { return 42; }
+
+	public static void draw(GuiGraphicsExtractor g, int x1, int y1) {
 		Minecraft mc = Minecraft.getInstance();
-		if (!RemiClient.hudOn || !RemiState.live() || mc.options.hideGui || mc.player == null) return;
-		if (RemiState.gem.isEmpty() || RemiState.gem.equals("blank")) return;
+		if (!visible() || mc.player == null) return;
 		synchronized (RemiState.class) {
 			int col = Theme.gem(RemiState.gem);
 			int n = RemiState.abilities.size();
-			int chip = 24, w = 44 + Math.max(2, n) * chip + 6, h = 42;
-			int x2 = g.guiWidth() / 2 - 91 - 8, x1 = x2 - w, y2 = g.guiHeight() - 4, y1 = y2 - h;
-			if (x1 < 4) { x1 = 4; x2 = x1 + w; y2 = g.guiHeight() - 26; y1 = y2 - h; } // tiny window: sit above the hotbar
+			int chip = 24, w = width(), h = height();
+			int x2 = x1 + w, y2 = y1 + h;
 			float t = Theme.time();
 			boolean awakened = RemiState.awkLeft > 0;
 

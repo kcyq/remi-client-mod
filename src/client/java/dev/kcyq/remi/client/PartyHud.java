@@ -15,14 +15,16 @@ import net.minecraft.world.BossEvent;
 public final class PartyHud {
 	private PartyHud() {}
 
-	public static void party(GuiGraphicsExtractor g, DeltaTracker dt) {
-		Minecraft mc = Minecraft.getInstance();
-		if (!RemiClient.hudOn || !RemiState.live() || !RemiState.inDungeon || mc.options.hideGui) return;
+	static boolean visible() { return RemiState.live() && RemiState.inDungeon && !RemiState.party.isEmpty(); }
+	static int width() { return 112; }
+	static int height() { return Math.max(1, RemiState.party.size()) * 20 + 10; }
+
+	public static void party(GuiGraphicsExtractor g, int x, int y0) {
+		if (!visible()) return;
 		synchronized (RemiState.class) {
-			if (RemiState.party.isEmpty()) return;
-			int w = 112, rowH = 20, n = RemiState.party.size();
-			int x = 6, y = g.guiHeight() / 2 - (n * rowH) / 2;
-			Theme.small(g, "PARTY", x + 2, y - 9, Theme.MUTED, 0.6f);
+			int w = 112, rowH = 20;
+			int y = y0 + 10;
+			Theme.small(g, "PARTY", x + 2, y0 + 1, Theme.MUTED, 0.6f);
 			for (RemiState.Member m : RemiState.party) {
 				int col = Theme.gem(m.gem);
 				Theme.panel(g, x, y, x + w, y + rowH - 3, Theme.BG_SOFT, m.down ? Theme.alpha(Theme.BAD, 0.8f) : 0x30FFFFFF);
