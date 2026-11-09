@@ -1,0 +1,21 @@
+{
+	"schemaVersion": 1,
+	"id": "remiclient",
+	"version": "${version}",
+	"name": "Remi Client",
+	"description": "Remi SMP's own HUD: Essence abilities, dungeon map, party and boss frames, world map and waypoints.",
+	"authors": ["kcyq"],
+	"license": "All rights reserved",
+	"icon": "assets/remiclient/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": ["dev.kcyq.remi.RemiMod"],
+		"client": ["dev.kcyq.remi.client.RemiClient"]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
