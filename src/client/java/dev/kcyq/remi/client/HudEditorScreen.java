@@ -16,6 +16,10 @@ public class HudEditorScreen extends Screen {
 
 	@Override public boolean isPauseScreen() { return false; }
 
+	/** No blur here: you need to see the game behind it. */
+	@Override
+	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) { }
+
 	private int[] box(Module m) {
 		return m.place(width, height);
 	}

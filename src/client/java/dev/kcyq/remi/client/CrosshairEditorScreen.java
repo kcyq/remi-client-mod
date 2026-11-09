@@ -23,7 +23,7 @@ public class CrosshairEditorScreen extends Screen {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mx, int my, float delta) {
-		this.extractBackground(g, mx, my, delta);
+		// (Minecraft draws the blurred background itself just before this; drawing it again crashes)
 		int c = cell(), n = CrosshairModule.SIZE, x = gx(), y = gy();
 		int pw = n * c + 220, px = width / 2 - pw / 2 + 30 - 30, py = y - 30;
 		Theme.panel(g, x - 14, py, x + n * c + 200, y + n * c + 16, 0xF20E0C16, 0x30FFFFFF);

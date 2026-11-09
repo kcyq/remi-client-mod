@@ -71,7 +71,7 @@ public class RemiMenuScreen extends Screen {
 	// ------------------------------------------------------------ drawing
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mx, int my, float delta) {
-		this.extractBackground(g, mx, my, delta);
+		// (Minecraft draws the blurred background itself just before this; drawing it again crashes)
 		float e = ease();
 		scroll += (scrollTarget - scroll) * 0.35;
 		g.fill(0, 0, width, height, Theme.alpha(0x900A0812, e));

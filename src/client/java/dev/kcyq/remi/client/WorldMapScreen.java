@@ -24,6 +24,10 @@ public class WorldMapScreen extends Screen {
 	@Override
 	public boolean isPauseScreen() { return false; }
 
+	/** No blur here: you need to see the game behind it. */
+	@Override
+	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) { }
+
 	@Override
 	public boolean mouseScrolled(double mx, double my, double sx, double sy) {
 		double before = zoom;
