@@ -25,7 +25,7 @@ public class RemiMenuScreen extends Screen {
 	private boolean draggingScale = false;
 
 	private int px, py, pw, ph; // panel
-	private static final int SIDE = 96, TOP = 34, TILE_W = 118, TILE_H = 78, GAP = 8;
+	private static final int SIDE = 96, TOP = 34, TILE_MIN = 112, TILE_H = 78, GAP = 8;
 	private static final int[] SWATCHES = { 0xFFF4F2FA, 0xFFA77BFF, 0xFF2EE6D6, 0xFF4FD18B, 0xFFFFD34D, 0xFFFF6A2B, 0xFFFF5C6C, 0xFFFF8CE6, 0xFF6FA8FF, 0xFF1FB5C9, 0xFFAAAAAA, 0xFF202020 };
 
 	public RemiMenuScreen() { super(Component.literal("Remi Client")); }
@@ -58,7 +58,10 @@ public class RemiMenuScreen extends Screen {
 		return out;
 	}
 
-	private int cols() { return Math.max(1, (pw - SIDE - 20 + GAP) / (TILE_W + GAP)); }
+	private int avail() { return pw - SIDE - 24; }
+	private int cols() { return Math.max(1, (avail() + GAP) / (TILE_MIN + GAP)); }
+	/** tiles stretch so the grid fills the panel edge to edge */
+	private int tw() { return (avail() - (cols() - 1) * GAP) / cols(); }
 
 	private float ease() {
 		float t = Math.min(1f, (System.currentTimeMillis() - openedAt) / 200f);
@@ -118,7 +121,7 @@ public class RemiMenuScreen extends Screen {
 
 	private int[] tileAt(int i) {
 		int c = cols(), gx = px + SIDE + 12, gy = py + TOP + 4 - (int) scroll;
-		return new int[] { gx + (i % c) * (TILE_W + GAP), gy + (i / c) * (TILE_H + GAP) };
+		return new int[] { gx + (i % c) * (tw() + GAP), gy + (i / c) * (TILE_H + GAP) };
 	}
 
 	private void drawGrid(GuiGraphicsExtractor g, int mx, int my) {
@@ -133,9 +136,9 @@ public class RemiMenuScreen extends Screen {
 			if (y > bottom || y + TILE_H < top) continue;
 			float appear = Math.min(1f, Math.max(0f, (System.currentTimeMillis() - openedAt - i * 25) / 220f));
 			y += (int) ((1 - appear) * 10);
-			boolean hover = mx >= x && mx < x + TILE_W && my >= y && my < y + TILE_H && my > top && my < bottom;
+			boolean hover = mx >= x && mx < x + tw() && my >= y && my < y + TILE_H && my > top && my < bottom;
 			boolean on = m.on();
-			Theme.panel(g, x, y, x + TILE_W, y + TILE_H, Theme.alpha(hover ? 0xFF1C1828 : 0xFF15121F, appear), Theme.alpha(hover ? Theme.alpha(m.accent, 0.8f) : 0x22FFFFFF, appear));
+			Theme.panel(g, x, y, x + tw(), y + TILE_H, Theme.alpha(hover ? 0xFF1C1828 : 0xFF15121F, appear), Theme.alpha(hover ? Theme.alpha(m.accent, 0.8f) : 0x22FFFFFF, appear));
 			// icon
 			Theme.disc(g, x + 16, y + 16, 9, Theme.alpha(Theme.mix(m.accent, 0xFF000000, 0.55f), appear));
 			Theme.ring(g, x + 16, y + 16, 9, 1f, Theme.alpha(m.accent, appear * (on ? 1f : 0.4f)), 0);
@@ -146,28 +149,28 @@ public class RemiMenuScreen extends Screen {
 			String[] words = m.desc.split(" ");
 			StringBuilder l1 = new StringBuilder(), l2 = new StringBuilder();
 			for (String w : words) {
-				StringBuilder target = (font.width(l1 + " " + w) * 0.6f < TILE_W - 14 && l2.length() == 0) ? l1 : l2;
+				StringBuilder target = (font.width(l1 + " " + w) * 0.6f < tw() - 14 && l2.length() == 0) ? l1 : l2;
 				if (target.length() > 0) target.append(' ');
 				target.append(w);
 			}
 			Theme.small(g, l1.toString(), x + 7, y + 32, Theme.alpha(Theme.MUTED, appear), 0.6f);
 			String second = l2.toString();
-			while (font.width(second) * 0.6f > TILE_W - 14 && second.length() > 3) second = second.substring(0, second.length() - 4) + "...";
+			while (font.width(second) * 0.6f > tw() - 14 && second.length() > 3) second = second.substring(0, second.length() - 4) + "...";
 			Theme.small(g, second, x + 7, y + 40, Theme.alpha(Theme.MUTED, appear), 0.6f);
 			// gear
 			boolean gear = m.movable || m.hasColor() || m.id.equals("crosshair");
 			if (gear) {
-				boolean hg = mx >= x + TILE_W - 18 && mx < x + TILE_W - 4 && my >= y + 4 && my < y + 18;
-				g.text(font, "⚙", x + TILE_W - 15, y + 6, hg ? Theme.TEXT : Theme.DIM, false);
+				boolean hg = mx >= x + tw() - 18 && mx < x + tw() - 4 && my >= y + 4 && my < y + 18;
+				g.text(font, "⚙", x + tw() - 15, y + 6, hg ? Theme.TEXT : Theme.DIM, false);
 			}
 			// the big ENABLED / DISABLED button
 			int by = y + TILE_H - 20;
-			boolean hbtn = mx >= x + 6 && mx < x + TILE_W - 6 && my >= by && my < by + 14;
+			boolean hbtn = mx >= x + 6 && mx < x + tw() - 6 && my >= by && my < by + 14;
 			int col = on ? (hbtn ? 0xFF3FBF78 : 0xFF2FA866) : (hbtn ? 0xFFB83A4A : 0xFF8E2A38);
-			Theme.panel(g, x + 6, by, x + TILE_W - 6, by + 14, Theme.alpha(col, appear), 0);
-			if (on) g.fill(x + 7, by, x + TILE_W - 7, by + 1, Theme.alpha(0x60FFFFFF, appear));
-			Theme.centered(g, on ? "ENABLED" : "DISABLED", x + TILE_W / 2, by + 3, Theme.alpha(0xFFFFFFFF, appear));
-			if (on && m.accent != 0) g.fill(x + 6, by + 13, x + 6 + (int) ((TILE_W - 12) * ((Math.sin(t * 2 + i) + 1) / 2) * 0), by + 14, 0);
+			Theme.panel(g, x + 6, by, x + tw() - 6, by + 14, Theme.alpha(col, appear), 0);
+			if (on) g.fill(x + 7, by, x + tw() - 7, by + 1, Theme.alpha(0x60FFFFFF, appear));
+			Theme.centered(g, on ? "ENABLED" : "DISABLED", x + tw() / 2, by + 3, Theme.alpha(0xFFFFFFFF, appear));
+			if (on && m.accent != 0) g.fill(x + 6, by + 13, x + 6 + (int) ((tw() - 12) * ((Math.sin(t * 2 + i) + 1) / 2) * 0), by + 14, 0);
 		}
 		g.disableScissor();
 		if (list.isEmpty()) Theme.centered(g, "Nothing matches \"" + search + "\"", px + SIDE + (pw - SIDE) / 2, py + ph / 2, Theme.MUTED);
@@ -254,9 +257,9 @@ public class RemiMenuScreen extends Screen {
 			int[] p = tileAt(i);
 			int x = p[0], y = p[1];
 			if (y + TILE_H < py + TOP || y > py + ph) continue;
-			if (in(mx, my, x + 6, y + TILE_H - 20, TILE_W - 12, 14)) { m.cfg().enabled = !m.cfg().enabled; RemiConfig.save(); click(); return true; }
-			if (in(mx, my, x + TILE_W - 18, y + 4, 14, 14) || (in(mx, my, x, y, TILE_W, TILE_H - 22) && doubleClick)) { settingsFor = m; click(); return true; }
-			if (in(mx, my, x, y, TILE_W, TILE_H)) { settingsFor = m; click(); return true; }
+			if (in(mx, my, x + 6, y + TILE_H - 20, tw() - 12, 14)) { m.cfg().enabled = !m.cfg().enabled; RemiConfig.save(); click(); return true; }
+			if (in(mx, my, x + tw() - 18, y + 4, 14, 14) || (in(mx, my, x, y, tw(), TILE_H - 22) && doubleClick)) { settingsFor = m; click(); return true; }
+			if (in(mx, my, x, y, tw(), TILE_H)) { settingsFor = m; click(); return true; }
 		}
 		return super.mouseClicked(e, doubleClick);
 	}
