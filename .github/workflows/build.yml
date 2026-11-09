@@ -21,9 +21,11 @@ jobs:
       - name: Build
         run: chmod +x ./gradlew && ./gradlew build --stacktrace
       - name: API probe (prints the real 26.1 method names, for development)
+        if: always()
         continue-on-error: true
         run: |
-          JAR=$(find ~/.gradle .gradle -name "*.jar" 2>/dev/null | grep -i "minecraft" | grep -iv "sources\|loader\|fabric-api" | xargs ls -S 2>/dev/null | head -1)
+          find ~/.gradle .gradle -name "minecraft*.jar" 2>/dev/null | head -20
+          JAR=$(find ~/.gradle .gradle -name "minecraft*.jar" 2>/dev/null | grep -iE "client|merged" | grep -iv sources | head -1)
           echo "MC jar: $JAR"
           for c in net.minecraft.client.gui.GuiGraphicsExtractor net.minecraft.client.input.MouseButtonEvent net.minecraft.client.input.KeyEvent net.minecraft.client.input.CharacterEvent net.minecraft.client.gui.components.EditBox net.minecraft.resources.ResourceKey; do
             echo "=== $c"; javap -cp "$JAR" "$c" | grep -v "^Compiled" | head -150
